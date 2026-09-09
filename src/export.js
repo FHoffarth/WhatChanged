@@ -38,7 +38,9 @@ export function buildTextExport(result) {
 }
 export function buildCsvExport(result) {
   const columns=['change_number','type','old','new','context','change_id'];
-  const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';
+  const formulaLike=/(?:^|[\r\n])[\u0000-\u0020]*[=+\-@]/;
+  const neutralize=value=>formulaLike.test(value)?`'${value}`:value;
+  const quote=value=>'"'+neutralize(String(value??'')).replaceAll('"','""')+'"';
   return columns.join(',')+'\r\n'+exportEntries(result).map(e=>columns.map(c=>quote(e[c])).join(',')+'\r\n').join('');
 }
 export function exportFilename(extension,date) {

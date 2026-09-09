@@ -53,3 +53,27 @@ for(const width of [375,320])test(`export menu fits ${width}px`,async({page})=>{
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  for(const selector of ['#export-toggle','#export-options']){const rect=await page.locator(selector).boundingBox();expect(rect.x).toBeGreaterThanOrEqual(0);expect(rect.x+rect.width).toBeLessThanOrEqual(width);}
 });
+
+test('CSV download neutralizes formula-like document cells while UI, Markdown and Text stay literal',async({page})=>{
+ const formulaOld=' =1+1\nKontext alt';
+ const formulaNew='\t+SUM(1,2)\nKontext neu';
+ await compare(page,formulaOld,formulaNew);
+ await expect(page.locator('#text-old')).toHaveValue(formulaOld);
+ await expect(page.locator('#text-new')).toHaveValue(formulaNew);
+ await expect(page.locator('#diff')).toContainText('=1+1');
+ await expect(page.locator('#diff')).toContainText('+SUM(1,2)');
+
+ const csv=await download(page,'csv');
+ expect(csv.text).toBe([
+  'change_number,type,old,new,context,change_id',
+  '"1","Text entfernt","\' =1+1","","Alt: Zeile 1","change-1"',
+  '"2","Text entfernt","Kontext alt","","Alt: Zeile 2","change-2"',
+  '"3","Text hinzugefügt","","\'\t+SUM(1,2)","Neu: Zeile 1","change-3"',
+  '"4","Text hinzugefügt","","Kontext neu","Neu: Zeile 2","change-4"',
+  ''
+ ].join('\r\n'));
+ expect((await download(page,'md')).text).toContain(formulaOld.split('\n')[0]);
+ expect((await download(page,'txt')).text).toContain(formulaNew.split('\n')[0]);
+ await expect(page.locator('#text-old')).toHaveValue(formulaOld);
+ await expect(page.locator('#text-new')).toHaveValue(formulaNew);
+});

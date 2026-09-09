@@ -38,3 +38,45 @@ test('exports do not mutate or recompute the supplied result',()=>{
  const r={rows:[{kind:'modified',id:'original-id',oldText:'as supplied',newText:'as supplied'}],values:[]};
  const before=structuredClone(r);assert.ok(buildTextExport(r).includes('Text geändert'));assert.deepEqual(r,before);
 });
+
+test('CSV neutralizes formula-like content in every data column with exact bytes',()=>{
+ const r={
+  rows:[{
+   kind:'modified',id:'\t@change-id',oldText:' =1+1',newText:'\t+SUM(1,2)',oldLine:1,newLine:1
+  }],
+  values:[{
+   category:'number',changeId:'\t@change-id',oldValue:'\r-1+2',newValue:'\n@SUM(1,2)',
+   source:{oldText:'safe\n  =context,"quoted";Ä',newText:'ordinary\r\n\t+next'}
+  }]
+ };
+ const before=structuredClone(r);
+ assert.equal(buildCsvExport(r),[
+  'change_number,type,old,new,context,change_id',
+  '"1","Zahl geändert","\'\r-1+2","\'\n@SUM(1,2)","\'Alt:\n'+
+   'safe\n  =context,""quoted"";Ä\n\nNeu:\nordinary\r\n\t+next","\'\t@change-id"',
+  '"2","Text geändert","\' =1+1","\'\t+SUM(1,2)","Alt: Zeile 1\nNeu: Zeile 1","\'\t@change-id"',
+  ''
+ ].join('\r\n'));
+ assert.deepEqual(r,before);
+});
+
+test('CSV formula policy covers prefixes after whitespace and line breaks exactly',()=>{
+ const cases=[
+  ['=1+1','\'=1+1'],['+SUM(1,2)','\'+SUM(1,2)'],['-1+2','\'-1+2'],['@SUM(1,2)','\'@SUM(1,2)'],
+  ['  =1','\'  =1'],['\t+1','\'\t+1'],['\r-1','\'\r-1'],['\n@A','\'\n@A'],
+  ['safe\n =later','\'safe\n =later'],['safe\r\n\t@later','\'safe\r\n\t@later'],
+  ['"quoted",semi;colon\nplain','"quoted",semi;colon\nplain'],['Ä=1','Ä=1'],['=Ä+1','\'=Ä+1'],['ordinary text','ordinary text']
+ ];
+ for(const [input,expected] of cases) {
+  const r={rows:[{kind:'added',newText:input,oldText:null}],values:[]};
+  const escaped=expected.replaceAll('"','""');
+  assert.equal(buildCsvExport(r),`change_number,type,old,new,context,change_id\r\n"1","Text hinzugefügt","","${escaped}","",""\r\n`,input);
+ }
+});
+
+test('Markdown and Text preserve formula-like literals unchanged',()=>{
+ const literal=' =1+1\n\t+SUM(1,2)\n-1+2\n@SUM(1,2)';
+ const r={rows:[{kind:'added',newText:literal,oldText:null}],values:[]};
+ assert.ok(buildMarkdownExport(r).includes(literal));
+ assert.ok(buildTextExport(r).includes(literal));
+});
