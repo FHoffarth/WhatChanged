@@ -25,7 +25,7 @@ npm run test:browser
 
 `npm test` führt die reinen Logiktests mit Nodes eingebautem Test Runner aus. `npm run build` erzeugt `dist/`. `npm run test:browser` prüft diesen Build in echtem, headless Google Chrome über Playwright; dafür muss Chrome installiert sein. Port 48173 muss frei sein. Die Browserprüfung öffnet kein sichtbares Browserfenster. Screenshots und Testberichte bleiben lokal in ignorierten Ordnern.
 
-Es gibt **keine konfigurierte Bereitstellung**, keine GitHub Pages und keine Hosting-/Deployment-Workflows.
+Die Anwendung wird als statische GitHub-Pages-Site unter [fhoffarth.github.io/WhatChanged](https://fhoffarth.github.io/WhatChanged/) bereitgestellt. Der Workflow baut ausschließlich aus `main` oder nach manuellem Start und veröffentlicht nur das erzeugte Verzeichnis `dist/`.
 
 ## Bedienung
 
