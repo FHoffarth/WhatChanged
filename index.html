@@ -9,7 +9,7 @@
   <link rel="icon" href="data:,">
 </head>
 <body>
-  <header class="masthead"><a href="./" class="brand">WhatChanged<span>?</span></a><span class="edition">V0.1 · Lokal im Browser</span></header>
+  <header class="masthead"><a href="./" class="brand">WhatChanged<span>?</span></a><span class="edition">V0.1.1 · Lokal im Browser</span></header>
   <main>
     <div class="intro"><div><p class="eyebrow">DER DOKUMENTVERGLEICH</p><h1>Zeig mir nur,<br>was anders ist.</h1></div><p class="trust">Deine Dokumente bleiben<br>in deinem Browser.<br><span>Kein Upload. Keine Speicherung.</span></p></div>
     <section aria-label="Dokumente eingeben" class="inputs">
@@ -32,7 +32,7 @@
     <section id="results" aria-labelledby="result-heading" hidden>
       <div class="result-top"><div><p class="eyebrow">DAS HAT SICH GEÄNDERT</p><h2 id="result-heading">Der Vergleich</h2></div><p id="summary" role="status"></p></div>
       <ul id="values" aria-label="Belegte Zahlen- und Wertänderungen"></ul>
-      <div class="diff-toolbar"><p><span class="legend removed-label">− Entfernt</span> <span class="legend added-label">+ Hinzugefügt</span> <span class="legend">~ Geändert</span> <span class="legend">= Unverändert</span></p><div class="navigation"><button id="previous" aria-keyshortcuts="K">Vorherige Änderung</button><span id="position" role="status"></span><button id="next" aria-keyshortcuts="J">Nächste Änderung</button></div></div>
+      <div class="diff-toolbar"><p><span class="legend removed-label">− Entfernt</span> <span class="legend added-label">+ Hinzugefügt</span> <span class="legend">~ Geändert</span> <span class="legend">= Unverändert</span></p><div class="navigation"><div class="export-control"><button id="export-toggle" disabled aria-expanded="false" aria-controls="export-options">Änderungen exportieren</button><div id="export-options" class="export-options" hidden role="group" aria-label="Exportformat"><button data-export="md">Markdown</button><button data-export="csv">CSV</button><button data-export="txt">Text</button></div></div><button id="previous" aria-keyshortcuts="K">Vorherige Änderung</button><span id="position" role="status"></span><button id="next" aria-keyshortcuts="J">Nächste Änderung</button></div></div>
       <p class="keyboard-hint">Tastatur: J nächste · K vorherige Änderung. Textblöcke entsprechen Zeilen, auch Leerzeilen.</p>
       <div class="diff-head" aria-hidden="true"><span>ALT</span><span>NEU</span></div>
       <div id="diff" aria-label="Dokumentvergleich"></div>

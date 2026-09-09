@@ -2,7 +2,7 @@
 
 **Zeig mir nur, was anders ist.**
 
-WhatChanged? V0.1 vergleicht zwei Textversionen oder lokal extrahierten PDF-Text im Browser. Alt steht links, Neu rechts; auf kleinen Bildschirmen stehen die eindeutig beschrifteten Seiten untereinander. Entfernte, hinzugefügte und plausibel geänderte Zeilen werden mit unverändertem Kontext gezeigt. Geänderte Zeilen enthalten Wort-/Tokenmarkierungen.
+WhatChanged? V0.1.1 vergleicht zwei Textversionen oder lokal extrahierten PDF-Text im Browser. Alt steht links, Neu rechts; auf kleinen Bildschirmen stehen die eindeutig beschrifteten Seiten untereinander. Entfernte, hinzugefügte und plausibel geänderte Zeilen werden mit unverändertem Kontext gezeigt. Geänderte Zeilen enthalten Wort-/Tokenmarkierungen.
 
 Keine Zusammenfassung mit künstlicher Intelligenz, keine Interpretation von Bedeutung, rechtlichen Fristen, Risiko, Wichtigkeit oder Konsequenzen. Kein visuell exakter PDF-Vergleich.
 
@@ -34,6 +34,14 @@ Es gibt **keine konfigurierte Bereitstellung**, keine GitHub Pages und keine Hos
 3. Belegte Wertänderungen über ihre Schaltflächen im Diff aufrufen. **Vorherige Änderung**, **Nächste Änderung**, **K** und **J** navigieren zwischen Änderungen. Tastenkürzel greifen nicht in Eingabefeldern.
 
 Ein geladener PDF-Text ist schreibgeschützt; **Leeren** gibt die Seite für eine neue Eingabe frei. Änderungen an Eingaben verwerfen den alten Vergleich. Nichts wird stillschweigend abgeschnitten.
+
+## Änderungen exportieren (V0.1.1)
+
+**Änderungen exportieren** bietet lokale Downloads als Markdown, CSV und Text. Enthalten sind ausschließlich bereits berechnete Wertänderungen sowie geänderte, hinzugefügte und entfernte Textblöcke. Unveränderte Zeilen werden nicht als eigene Einträge exportiert. Es gibt keine neue Interpretation oder Rangfolge.
+
+Die Einträge folgen der Reihenfolge der Diff-Zeilen; belegte Wertänderungen stehen jeweils vor dem zugehörigen vollständigen Textblock. Beide teilen dieselbe vorhandene Änderungs-ID. Vorhandene Quelltexte und Zeilenpositionen werden als Kontext erhalten. Fehlende Felder bleiben leer bzw. werden in Markdown/Text ausgelassen. Mehrzeilige Inhalte und Unicode bleiben erhalten. Markdown verwendet geschützte Codeblöcke; CSV ist UTF-8 mit Komma-Trennung, festen Spalten und korrekt maskierten Anführungszeichen/Zeilenumbrüchen.
+
+Ohne Vergleich, ohne Änderungen und nach jeder Eingabeänderung ist der Export gesperrt. Downloads entstehen ausschließlich per lokalem Blob/Object-URL, das anschließend freigegeben wird. Es gibt keine Übertragung und keine zusätzliche Speicherung durch die Anwendung; die heruntergeladene Datei speichert der Browser auf ausdrücklichen Klick. Dateinamen verwenden nur das UTC-Exportdatum, etwa `WhatChanged-Aenderungen-2026-09-09.csv`, keine Dokumentinhalte. Das Exportmenü lässt sich per Tab/Enter bedienen und mit Escape schließen.
 
 ## Datenschutz
 
@@ -94,6 +102,7 @@ Leere, ungültige und textlose PDFs führen zu einer Fehlermeldung. Passwortgesc
 
 - `src/core.js`: Normalisierung, begrenzter Diff, Ähnlichkeitsregel, Werte und Zusammenfassungszähler.
 - `src/limits.js`: zentrale Größenlimits.
+- `src/export.js`: reine Serialisierung des vorhandenen Ergebnisses als Markdown/CSV/Text.
 - `src/pdf.js`: lokale, abbrechbare PDF.js-Extraktion.
 - `src/main.js`, `src/style.css`, `index.html`: semantische deutsche Oberfläche, sichere Darstellung, Tastatur und Responsive Layout.
 - `tests/core.test.js`: automatisierte reine Logiktests.

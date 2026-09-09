@@ -1,11 +1,13 @@
 import './style.css';
+import {buildMarkdownExport,buildCsvExport,buildTextExport,exportFilename} from './export.js';
 import {compare} from './core.js';
 import {validateText} from './limits.js';
 import {extractPdf} from './pdf.js';
 const $=id=>document.getElementById(id);
-const sides={};let changes=[],active=0;
+const sides={};let changes=[],active=0,currentResult=null;
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 function invalidate() {
+  currentResult=null;$('export-toggle').disabled=true;closeExport();
   $('results').hidden=true;$('diff').replaceChildren();$('values').replaceChildren();changes=[];$('error').hidden=true;
 }
 function readiness() {
@@ -94,6 +96,41 @@ $('compare').addEventListener('click',()=>{
     }
     $('previous').disabled=$('next').disabled=!changes.length;$('position').textContent=changes.length?'':'0 / 0';
     active=0;$('results').hidden=false;move(0,false);
+    currentResult=result;$('export-toggle').disabled=!changes.length;
   }catch(error){$('error').textContent=error.message;$('error').hidden=false;}
 });
 readiness();
+
+function closeExport() {
+  $('export-options').hidden=true;$('export-toggle').setAttribute('aria-expanded','false');
+}
+$('export-toggle').addEventListener('click',()=>{
+  const open=$('export-options').hidden;
+  $('export-options').hidden=!open;$('export-toggle').setAttribute('aria-expanded',String(open));
+  if(open)$('export-options').querySelector('button').focus();
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && !$('export-options').hidden){closeExport();$('export-toggle').focus();event.preventDefault();}
+});
+document.addEventListener('click',event=>{if(!event.target.closest('.export-control'))closeExport();});
+$('export-options').addEventListener('focusout',event=>{if(!event.relatedTarget?.closest('.export-control'))closeExport();});
+const exporters={md:[buildMarkdownExport,'text/markdown'],csv:[buildCsvExport,'text/csv'],txt:[buildTextExport,'text/plain']};
+$('export-options').addEventListener('click',event=>{
+  const extension=event.target.closest('[data-export]')?.dataset.export;
+  if(!exporters[extension] || !currentResult || !changes.length)return;
+  const [build,mime]=exporters[extension];
+  let url;
+  try {
+    const blob=new Blob([build(currentResult)],{type:mime+';charset=utf-8'});
+    url=URL.createObjectURL(blob);
+    const link=document.createElement('a');link.href=url;
+    link.download=exportFilename(extension,new Date().toISOString().slice(0,10));
+    document.body.append(link);
+    try {link.click();} finally {link.remove();}
+  }catch(error){$('error').textContent='Export konnte nicht erstellt werden: '+error.message;$('error').hidden=false;}
+  finally {
+    // Allow the browser to start reading the Blob before releasing its URL.
+    if(url)setTimeout(()=>URL.revokeObjectURL(url),1000);
+    closeExport();$('export-toggle').focus();
+  }
+});

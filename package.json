@@ -1,6 +1,6 @@
 {
   "name": "whatchanged",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Lokaler Vergleich für Text und PDFs. Zeigt exakt, was sich geändert hat.",
@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "test": "node --test tests/core.test.js",
+    "test": "node --test tests/core.test.js tests/export.test.js",
     "test:browser": "playwright test",
     "predev": "node scripts/vendor.mjs",
     "prebuild": "node scripts/vendor.mjs"
